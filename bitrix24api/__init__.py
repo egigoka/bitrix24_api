@@ -1,4 +1,4 @@
-from commands import *
+from commands import Network, imdict, Print, Time
 from typing import Union
 from ._version import __version__
 
