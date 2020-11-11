@@ -17,11 +17,13 @@ class BitrixRESTAPI:
         output_url = output_url.replace("#", "%23")
         return output_url
 
-    def get(self, method: str, params: dict = imdict(), verbose=False) -> dict:
+    def get(self, method: str, params: Union[dict, list, str] = "", verbose=False) -> dict:
         if isinstance(params, dict) or isinstance(params, list):
             params_str = self.str_of_url_params(params)
+        elif isinstance(params, str):
+            params_str = params
         else:
-            raise TypeError("params must be dict")
+            raise TypeError("params must be dict, list or str")
 
         url = self.url_escaping(f"{self.link}/{method}?{params_str}")
         response = Network.get(url, verify=self.verify)
@@ -33,7 +35,7 @@ class BitrixRESTAPI:
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
-                return self.get(method=method, params=params)
+                return self.get(method=method, params=params, verbose=verbose)
         except KeyError:
             pass
 
@@ -80,6 +82,25 @@ class BitrixRESTAPI:
 
         return output
 
+    def post(self, method, data, verbose = False):
+        url = self.url_escaping(f"{self.link}/{method}")
+        response = Network.post(url, data=data)
+
+        if verbose:
+            import urllib.parse
+            Print.colored(urllib.parse.unquote(response.url), "green")
+
+        response_json = response.json()
+        try:
+            if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
+                Time.sleep(1)
+                return self.post(method=method, data=data, verbose=verbose)
+        except KeyError:
+            pass
+
+        return response_json
+
+
     @staticmethod
     def zfill(str_like, count_of_zeros):
         return str(str_like).zfill(count_of_zeros)
@@ -94,7 +115,7 @@ class BitrixRESTAPI:
             if dict_name is None:
                 current_prefix = key
             else:
-                current_prefix = prefix + f"[{key}]"
+                current_prefix = str(prefix) + f"[{key}]"
             
             if isinstance(value, list) or isinstance(value, tuple):
                 value = dict(enumerate(value))
@@ -103,11 +124,11 @@ class BitrixRESTAPI:
                 output_list = output_list + self.dict2list_of_url_params(dict_=value, prefix=current_prefix, dict_name=key)
             else:
                 output_list.append(f"{current_prefix}={value}")
-            # debug Print(f"{prefix=}{current_prefix=}{key=}{value=}{output_list=}")
+            Print(f"{prefix=}{current_prefix=}{key=}{value=}{output_list=}")
         return output_list
 
     def str_of_url_params(self, input: Union[dict, list]) -> str:
         if isinstance(input, list):
-            input = enumerate(input)
+            input = dict(enumerate(input))
         list_ = self.dict2list_of_url_params(input)
         return "&".join(list_)
