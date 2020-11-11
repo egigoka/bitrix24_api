@@ -26,7 +26,8 @@ class BitrixRESTAPI:
         url = self.url_escaping(f"{self.link}/{method}?{params_str}")
         response = Network.get(url, verify=self.verify)
         if verbose:
-            Print.colored(response.url, "green")
+            import urllib.parse
+            Print.colored(urllib.parse.unquote(response.url), "green")
         
         response_json = response.json()
         try:
@@ -38,9 +39,10 @@ class BitrixRESTAPI:
 
         return response_json
 
-    def smart_get(self, method: str,
+    def smart_get(self,
+                  method: str,
                   params: dict = None,
-                  verbose=False) -> dict:
+                  verbose: bool = False) -> Union[dict, list]:
         output = None
         if params is None:
             params = {}
