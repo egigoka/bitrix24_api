@@ -19,7 +19,9 @@ class BitrixRESTAPI:
 
     def get(self, method: str, params: dict = imdict(), verbose=False) -> dict:
         if isinstance(params, dict):
-            params_str = self.dict2str_of_url_params(params)
+            params_str = self.str_of_url_params(params)
+        elif isinstance(params, list):
+            params_str = self.list
         else:
             raise TypeError("params must be dict")
 
@@ -106,6 +108,8 @@ class BitrixRESTAPI:
             # debug Print(f"{prefix=}{current_prefix=}{key=}{value=}{output_list=}")
         return output_list
 
-    def dict2str_of_url_params(self, dict_: dict) -> str:
-        list_ = self.dict2list_of_url_params(dict_)
+    def str_of_url_params(self, input: Union[dict, list]) -> str:
+        if isinstance(input, list):
+            input = enumerate(input)
+        list_ = self.dict2list_of_url_params(input)
         return "&".join(list_)
