@@ -82,19 +82,20 @@ class BitrixRESTAPI:
 
         return output
 
-    def post(self, method, data, verbose = False):
+    def post(self, method, json, verbose = False):
         url = self.url_escaping(f"{self.link}/{method}")
-        response = Network.post(url, data=data)
+        response = Network.post(url, json=json)
 
         if verbose:
             import urllib.parse
             Print.colored(urllib.parse.unquote(response.url), "green")
+            Print.prettify(json)
 
         response_json = response.json()
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
-                return self.post(method=method, data=data, verbose=verbose)
+                return self.post(method=method, json=json, verbose=verbose)
         except KeyError:
             pass
 
