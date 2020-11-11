@@ -18,10 +18,8 @@ class BitrixRESTAPI:
         return output_url
 
     def get(self, method: str, params: dict = imdict(), verbose=False) -> dict:
-        if isinstance(params, dict):
+        if isinstance(params, dict) or isinstance(params, list):
             params_str = self.str_of_url_params(params)
-        elif isinstance(params, list):
-            params_str = self.list
         else:
             raise TypeError("params must be dict")
 
