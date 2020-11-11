@@ -125,7 +125,7 @@ class BitrixRESTAPI:
                 output_list = output_list + self.dict2list_of_url_params(dict_=value, prefix=current_prefix, dict_name=key)
             else:
                 output_list.append(f"{current_prefix}={value}")
-            Print(f"{prefix=}{current_prefix=}{key=}{value=}{output_list=}")
+            # Print(f"{prefix=}{current_prefix=}{key=}{value=}{output_list=}")
         return output_list
 
     def str_of_url_params(self, input: Union[dict, list]) -> str:
