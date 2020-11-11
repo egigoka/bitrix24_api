@@ -1,1 +1,1 @@
-import * from .__init__
+from .__init__ import *
