@@ -65,7 +65,7 @@ class BitrixRESTAPI:
             # responses with dict result with only
             # one key and objects inside it's value
             if isinstance(output_part, dict) and len(output_part) == 1:
-                output_part = output_part.values()[0]
+                output_part = tuple(output_part.values())[0]
 
             # if it's first page
             if output is None:
