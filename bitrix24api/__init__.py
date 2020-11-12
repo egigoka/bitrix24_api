@@ -61,6 +61,12 @@ class BitrixRESTAPI:
                 Print.prettify(response)
                 raise
 
+            # if it's some stupid ass method that
+            # responses with dict result with only
+            # one key and objects inside it's value
+            if isinstance(output_part, dict) and len(output_part) == 1:
+                output_part = output_part.values()[0]
+
             # if it's first page
             if output is None:
                 output = output_part
