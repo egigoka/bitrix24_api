@@ -58,6 +58,7 @@ class BitrixRESTAPI:
                     Print.prettify(response['result'])
                 output_part = response['result']
             except KeyError:
+                Print.colored(method, params, "green")
                 Print.prettify(response)
                 raise
 
