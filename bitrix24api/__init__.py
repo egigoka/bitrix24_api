@@ -1,3 +1,4 @@
+import requests.exceptions
 from commands import Network, imdict, Print, Time
 from typing import Union
 from ._version import __version__
@@ -26,7 +27,10 @@ class BitrixRESTAPI:
             raise TypeError("params must be dict, list or str")
 
         url = self.url_escaping(f"{self.link}/{method}?{params_str}")
-        response = Network.get(url, verify=self.verify)
+        try:
+            response = Network.get(url, verify=self.verify)
+        except (requests.exceptions.InvalidSchema, requests.exceptions.InvalidURL):
+            raise ConnectionError("Wrong password or hook url")
         if verbose:
             import urllib.parse
             Print.colored(urllib.parse.unquote(response.url), "green")
