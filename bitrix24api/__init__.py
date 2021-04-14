@@ -5,10 +5,11 @@ from ._version import __version__
 
 
 class BitrixRESTAPI:
-    def __init__(self, link):
+    def __init__(self, link, verbose=False):
         self.link = link.rstrip("/")
         self.verify = True
-        print("bitrix_hook", __version__)
+        if verbose:
+            print("bitrix_hook", __version__)
         
     def disable_ssl_sert_checking(self, bool_: bool):
         self.verify = not bool_
