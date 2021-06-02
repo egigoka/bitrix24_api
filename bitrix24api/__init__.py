@@ -42,8 +42,8 @@ class BitrixRESTAPI:
         try:
             response_json = response.json()
         except json.decoder.JSONDecodeError as e:
-            e.msg = "response raw text: " + response.text + "\n" + e.msg
-            raise json.decoder.JSONDecodeError(e.msg, e.doc, e.pos)
+            msg = "response raw text: " + response.text + "\n" + e.msg
+            raise json.decoder.JSONDecodeError(msg, e.doc, e.pos)
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
@@ -53,16 +53,23 @@ class BitrixRESTAPI:
 
         return response_json
 
-    def smart_get(self,
-                  method: str,
-                  params: dict = None,
-                  verbose: bool = False) -> Union[dict, list]:
+    def smart_get(self, method, params=None, verbose=False):
+        return self.smart(method=method, params=params, post=False, verbose=verbose)
+
+    def smart(self,
+              method: str,
+              params: dict = None,
+              post: bool = False,
+              verbose: bool = False) -> Union[dict, list]:
         output = None
         if params is None:
             params = {}
         while True:
             params["start"] = 0 if output is None else len(output)
-            response = self.get(method=method, params=params, verbose=verbose)
+            if post:
+                response = self.post(method=method, json=params, verbose=verbose)
+            else:
+                response = self.get(method=method, params=params, verbose=verbose)
 
             # check if there is result
             try:
@@ -101,7 +108,7 @@ class BitrixRESTAPI:
 
         return output
 
-    def post(self, method, json, verbose = False):
+    def post(self, method, json, verbose=False):
         url = self.url_escaping(f"{self.link}/{method}")
         response = Network.post(url, json=json)
 
@@ -110,7 +117,11 @@ class BitrixRESTAPI:
             Print.colored(urllib.parse.unquote(response.url), "green")
             Print.prettify(json)
 
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except json.decoder.JSONDecodeError as e:
+            msg = "response raw text: " + response.text + "\n" + e.msg
+            raise json.decoder.JSONDecodeError(msg, e.doc, e.pos)
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
