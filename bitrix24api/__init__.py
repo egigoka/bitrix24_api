@@ -1,6 +1,7 @@
 import requests.exceptions
 from commands import Network, imdict, Print, Time
 from typing import Union
+import json
 from ._version import __version__
 
 
@@ -30,13 +31,19 @@ class BitrixRESTAPI:
         url = self.url_escaping(f"{self.link}/{method}?{params_str}")
         try:
             response = Network.get(url, verify=self.verify)
-        except (requests.exceptions.InvalidSchema, requests.exceptions.InvalidURL):
+        except (requests.exceptions.InvalidSchema,
+                requests.exceptions.InvalidURL,
+                requests.exceptions.MissingSchema):
             raise ConnectionError("Wrong password or hook url")
         if verbose:
             import urllib.parse
             Print.colored(urllib.parse.unquote(response.url), "green")
         
-        response_json = response.json()
+        try:
+            response_json = response.json()
+        except json.decoder.JSONDecodeError as e:
+            e.msg = "response raw text: " + response.text + "\n" + e.msg
+            raise e
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
