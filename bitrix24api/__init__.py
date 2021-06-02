@@ -43,7 +43,7 @@ class BitrixRESTAPI:
             response_json = response.json()
         except json.decoder.JSONDecodeError as e:
             e.msg = "response raw text: " + response.text + "\n" + e.msg
-            raise e
+            raise json.decoder.JSONDecodeError(e.msg, e.doc, e.pos)
         try:
             if response_json["error"] == 'QUERY_LIMIT_EXCEEDED':
                 Time.sleep(1)
