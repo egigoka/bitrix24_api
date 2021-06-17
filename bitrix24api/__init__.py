@@ -77,10 +77,7 @@ class BitrixRESTAPI:
                     Print.prettify(response['result'])
                 output_part = response['result']
             except KeyError as e:
-                raise KeyError(f"""{e}
-method: {method}
-params: {params}
-response: {response}""")
+                raise KeyError(f"""{e}    method: {method}    params: {params}    response: {response}""", "")
 
             # if it's some stupid ass method that
             # responses with dict result with only
